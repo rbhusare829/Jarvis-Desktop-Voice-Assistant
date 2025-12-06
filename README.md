@@ -81,7 +81,7 @@ terraform apply --auto-approve
 
 ### EC2 Instances Dashboard
 
-![EC2 Instances](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233541.png)
+![EC2 Instances](Images/Screenshot 2025-12-04 233541.png)
 
 ---
 
@@ -109,7 +109,7 @@ Navigate to:
 * Username: `ubuntu`
 * Private Key: content of `check.pem`
 
-![Jenkins Credentials](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233515.png)
+![Jenkins Credentials](Images/Screenshot 2025-12-04 233515.png)
 
 ---
 
@@ -220,7 +220,7 @@ Go to:
 Push any new commit to GitHub.
 Jenkins should automatically trigger and deploy the update.
 
-![Jenkins Success](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233438.png)
+![Jenkins Success](Images/Screenshot 2025-12-04 233438.png)
 
 ---
 
@@ -246,8 +246,8 @@ It provides a strong foundation for scalable DevOps workflows.
 | Terraform Init            | ![](Images/terraform_init.png)        |
 | Terraform Plan            | ![](Images/terraform_plan.png )        |
 | Terraform Apply           | ![](Images/terraform_auto_approve.png) |
-| EC2 Instances             | ![](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233541.png)                |
+| EC2 Instances             | ![](Images/Screenshot 2025-12-04 233541.png)                |
 | Jarvis Service            | ![](Images/activate_jarvis.png)        |
-| Jenkins Credentials       | ![](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233515.png)    |
-| Jenkins Deployment Output | ![](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233438.png)  |
+| Jenkins Credentials       | ![](Images/Screenshot 2025-12-04 233515.png)    |
+| Jenkins Deployment Output | ![](Images/Screenshot 2025-12-04 233438.png)  |
 >>>>>>> c8a1276 (on main)
