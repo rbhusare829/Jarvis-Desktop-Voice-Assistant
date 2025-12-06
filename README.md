@@ -1,100 +1,253 @@
-# Jarvis Desktop Voice Assistant🔥
 
-<img src="https://giffiles.alphacoders.com/212/212508.gif" alt="">
+# Jarvis-Desktop-Voice-Assistant
+=======
+# **Deploying the Jarvis Desktop Voice Assistant on AWS EC2 using Terraform and Jenkins**
 
-**Have you ever wondered how cool it would be to have your own assistant? Imagine how easier it would be doing Wikipedia searches without opening web browsers, and performing many other daily tasks like playing music with the help of a single voice command, opening different browsers in just a voice command.**
+This project demonstrates a complete DevOps workflow for deploying the **Jarvis Desktop Voice Assistant** application on an AWS EC2 instance using **Terraform** (Infrastructure as Code) and **Jenkins CI/CD** with GitHub Webhooks for automated deployments.
 
-**This project is simple desktop voice assistant built with python named as “Jarvis Desktop Voice Assistant”. This project is fully completed and error free. It was compiled in VS Code Editor.**
+---
+![](Images/over.png)
 
-**🔸 Let's be honest, it's not as intelligent as in the movie, but it can do a lot of cool things and automate your daily tasks you do on your personal computers/laptops.**
+## **1. Project Architecture**
 
-## 📌Built with
+```
+GitHub Repo  --->  Jenkins Pipeline  --->  EC2 Instance (Jarvis App)
+       |                   |  
+Webhook Trigger      SSH Deploy via Key  
+```
 
-<code><img height="30" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png"></code>
+---
 
-## 📌Features
+## **2. Prerequisites**
 
-It can do a lot of cool things, some of them being:
+* AWS Account
+* Terraform installed
+* Jenkins installed on EC2
+* SSH Key Pair
+* GitHub repository fork
+* Basic AWS & CI/CD knowledge
 
-- Greet user
-- Tell current time and date
-- Launch applications/softwares
-- Open any website
-- Tells about any person (via Wikipedia)
-- Can search anything on Google
-- Plays music
-- Take important note in text file
-- Can take screenshot and save it with custom filename
-- Can tell jokes
+---
 
-## Requirements
+## **3. Step 1: Fork the Repository**
 
-Python 3.6+
+Fork the original project:
 
-## 📌Installation
+```
+https://github.com/kishanrajput23/Jarvis-Desktop-Voice-Assistant
+```
 
-1. **Fork The Repository**
-   - Click the "Fork" button on the top right corner of the repository page.
+Apply at least one UI or text update and push it to your GitHub repository.
 
-2. **Clone The Repository**
-   - Clone the forked repository to your local machine:
-     ```bash
-     git clone <URL>
-     cd Jarvis-Desktop-Voice-Assistant
-     ```
+### Screenshot Example
 
-3.  **Create and Activate a Virtual Environment**
-     - Create a virtual environment:
-     ```bash
-     python -m venv .venv
-     ```
-   - Activate the virtual environment:
-     - For Windows:
-       ```bash
-       .venv\Scripts\activate
-       ```
-     - For macOS/Linux:
-       ```bash
-       source .venv/bin/activate
-       ```
-   - This activates the virtual environment and should look like `(venv) directory/of/your/project>`
+![Git Clone](Images/git_clone.png)
 
-4. **Install Requirements**
+---
 
-   - Install all the requirements given in **[requirements.txt](https://github.com/kishanrajput23/Jarvis-Desktop-Voice-Assistant/blob/main/requirements.txt)** by running the command `pip install -r requirements.txt`
+## **4. Step 2: Provision Infrastructure Using Terraform**
 
-5. **Install PyAudio**  
-   - Follow the instructions given **[here](https://stackoverflow.com/questions/52283840/i-cant-install-pyaudio-on-windows-how-to-solve-error-microsoft-visual-c-14)**
+Terraform provisions:
 
-6. **Run the Assistant**
-  - Run the main script:
-    ```bash
-    python jarvis.py
-    ```
-  - Now Enjoy with your own assistant !!!!
+* EC2 instance
+* Security group
+* Key pair
+* User data to configure Jarvis
+* systemd service for auto-start
 
-7. **Deactivate the Virtual Environment**
-   - After you're done, deactivate the virtual environment:
-     ```bash
-     deactivate
-     ```
+### Initialize Terraform
 
-## 📌Contributing
+```bash
+terraform init
+```
+---
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+### Run Terraform Plan
 
-## 📌Author
+```bash
+terraform plan
+```
+---
 
-👤 **Kishan Kumar Rai**
+### Apply Terraform
 
-- Twitter: [@kishan_rajput23](https://twitter.com/kishan_rajput23)
-- Github: [@kishanrajput23](https://github.com/kishanrajput23)
-- LinkedIn: [@kishan-kumar-rai](https://linkedin.com/in/kishan-kumar-rai-23112000)
+```bash
+terraform apply --auto-approve
+```
 
-## 📌Show your support
+![Terraform Apply](Images/terraform_auto_approve.png)
 
-Please ⭐️ this repository if this project helped you!
+---
 
-## 📌License
+### EC2 Instances Dashboard
 
-This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.
+![EC2 Instances](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233541.png)
+
+---
+
+## **5. Step 3: Verify Jarvis Service on EC2**
+
+SSH into the EC2 instance and verify service status:
+
+```bash
+sudo systemctl status jarvis
+```
+
+![Jarvis Service](Images/activate_jarvis.png)
+
+---
+
+## **6. Step 4: Configure Jenkins**
+
+### Add SSH Credentials
+
+Navigate to:
+**Manage Jenkins → Credentials → System → Global → Add Credentials**
+
+* Kind: SSH Username with Private Key
+* ID: `devops-key`
+* Username: `ubuntu`
+* Private Key: content of `check.pem`
+
+![Jenkins Credentials](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233515.png)
+
+---
+
+## **7. Step 5: Create Jenkins Pipeline**
+
+Use the following Jenkinsfile:
+
+```groovy
+pipeline {
+    agent any
+
+    environment {
+        REMOTE_USER = "ubuntu"
+        REMOTE_HOST = "13.233.184.203"
+        REMOTE_DIR  = "/home/ubuntu/Jarvis-Desktop-Voice-Assistant"
+        SERVICE_NAME = "jarvis"
+        CRED_ID = "devops-key"
+        SSH_OPTS = "-o StrictHostKeyChecking=no"
+    }
+
+    stages {
+
+        stage("Checkout Code") {
+            steps {
+                git branch: 'main',
+                    url: '(https://github.com/rbhusare829/Jarvis-Desktop-Voice-Assistant.git)'
+            }
+        }
+
+        stage("Fix Permissions on Server") {
+            steps {
+                sshagent (credentials: ["${CRED_ID}"]) {
+                    sh """
+                    ssh ${SSH_OPTS} ${REMOTE_USER}@${REMOTE_HOST} '
+                        sudo mkdir -p ${REMOTE_DIR}
+                        sudo chown -R ubuntu:ubuntu ${REMOTE_DIR}
+                        sudo chmod -R 755 ${REMOTE_DIR}
+                    '
+                    """
+                }
+            }
+        }
+
+        stage("Deploy Code via rsync") {
+            steps {
+                sshagent (credentials: ["${CRED_ID}"]) {
+                    sh """
+                    rsync -avz -e "ssh ${SSH_OPTS}" \
+                    --exclude='.git' \
+                    --exclude='__pycache__' \
+                    ./ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/
+                    """
+                }
+            }
+        }
+
+        stage("Install Dependencies") {
+            steps {
+                sshagent (credentials: ["${CRED_ID}"]) {
+                    sh """
+                    ssh ${SSH_OPTS} ${REMOTE_USER}@${REMOTE_HOST} '
+                        sudo apt update -y
+                        sudo apt install -y python3 python3-pip ffmpeg
+                        cd ${REMOTE_DIR}
+                        pip3 install -r requirements.txt --break-system-packages || true
+                    '
+                    """
+                }
+            }
+        }
+
+        stage("Restart Jarvis Service") {
+            steps {
+                sshagent (credentials: ["${CRED_ID}"]) {
+                    sh """
+                    ssh ${SSH_OPTS} ${REMOTE_USER}@${REMOTE_HOST} '
+                        sudo systemctl daemon-reload
+                        sudo systemctl restart ${SERVICE_NAME}
+                        sudo systemctl status ${SERVICE_NAME} --no-pager
+                    '
+                    """
+                }
+            }
+        }
+    }
+}
+```
+
+---
+
+## **8. Step 6: Configure GitHub Webhook**
+
+Go to:
+**GitHub → Repo → Settings → Webhooks → Add Webhook**
+
+* Payload URL:
+
+  ```
+  http://<JENKINS_PUBLIC_IP>:8080/github-webhook/
+  ```
+* Content type: `application/json`
+* Event: **Just the push event**
+
+---
+
+## **9. Step 7: Validate Automatic Deployment**
+
+Push any new commit to GitHub.
+Jenkins should automatically trigger and deploy the update.
+
+![Jenkins Success](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233438.png)
+
+---
+
+## **10. Conclusion**
+
+This project demonstrates:
+
+* Infrastructure automation using Terraform
+* CI/CD automation with Jenkins
+* Secure SSH deployment
+* Continuous deployment using GitHub Webhooks
+* Managing Python applications as systemd services
+
+It provides a strong foundation for scalable DevOps workflows.
+
+---
+
+## **Screenshot Index**
+
+| Step                      | Image                             |
+| ------------------------- | --------------------------------- |
+| Git Clone                 | ![](Images/git_clone.png)              |
+| Terraform Init            | ![](Images/terraform_init.png)        |
+| Terraform Plan            | ![](Images/terraform_plan.png )        |
+| Terraform Apply           | ![](Images/terraform_auto_approve.png) |
+| EC2 Instances             | ![](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233541.png)                |
+| Jarvis Service            | ![](Images/activate_jarvis.png)        |
+| Jenkins Credentials       | ![](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233515.png)    |
+| Jenkins Deployment Output | ![](c:\Users\lenovo\OneDrive\Pictures\Screenshots\Screenshot 2025-12-04 233438.png)  |
+>>>>>>> c8a1276 (on main)
